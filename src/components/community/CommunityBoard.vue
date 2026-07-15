@@ -37,7 +37,7 @@
 
           <td>{{ post.like_count }}</td>
 
-          <td>{{ post.createdTime }}</td>
+          <td>{{ post.created_at }}</td>
         </tr>
       </tbody>
     </table>

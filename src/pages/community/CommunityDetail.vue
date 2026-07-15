@@ -6,7 +6,7 @@
       </h2>
 
       <div class="info">
-        <span> 작성시간 {{ post.createdTime }} </span>
+        <span> 작성시간 {{ post.created_at }} </span>
 
         <span> 조회 {{ post.view_count }} </span>
 
@@ -19,7 +19,7 @@
     </div>
 
     <div class="like-section">
-      <button class="like-btn" @click="clickLike">
+      <button class="like-btn" @click="clickLike(post_id)">
         <img src="@/assets/images/like.png" alt="좋아요" />
       </button>
 
@@ -81,10 +81,12 @@ const inputPw = ref('')
 
 const actionType = ref('')
 
-const clickLike = async (content_id) => {
+const clickLike = async (post_id) => {
   // API
-  // PUT /api/v1/category/{category}/{content_id}/like
-  // await api.get(`/api/v1/category/${category}/${content_id}/like`)
+  // POST /api/v1/community/posts/{post_id}/like
+  await api.post(`/api/v1/community/posts/${post_id}/like`)
+
+  fetchPost()
 }
 
 const openPasswordModal = (type) => {
