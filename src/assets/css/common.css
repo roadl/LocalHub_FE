@@ -1,0 +1,111 @@
+:root {
+  --color-primary: #4a90e2;
+  --color-primary-hover: #357abd;
+  --color-background: #f8fafc;
+  --color-surface: #ffffff;
+  --color-border: #dce7f5;
+  --color-text: #333333;
+
+  --header-height: 70px;
+
+  --radius: 8px;
+
+  --shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+
+  --page-padding: 24px;
+  --content-width: 1200px;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html,
+body,
+#app {
+  width: 100%;
+  min-height: 100vh;
+}
+
+body {
+  font-family: 'Pretendard', 'Noto Sans KR', sans-serif;
+
+  background: var(--color-background);
+  color: var(--color-text);
+
+  overflow-x: hidden;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  font: inherit;
+  cursor: pointer;
+  border: none;
+  background: none;
+}
+
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+ul,
+ol {
+  list-style: none;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+}
+
+
+/* 공통 페이지 컨테이너 */
+.page-container {
+  width: 100%;
+  max-width: var(--content-width);
+  margin: 0 auto;
+  padding: 0 var(--page-padding);
+}
+
+
+/* 모바일 */
+@media (max-width: 768px) {
+  :root {
+    --header-height: 60px;
+    --page-padding: 16px;
+  }
+
+  body {
+    font-size: 14px;
+  }
+
+  button {
+    min-height: 40px;
+  }
+
+  input,
+  textarea,
+  select {
+    width: 100%;
+  }
+}
+
+
+/* 작은 모바일 */
+@media (max-width: 480px) {
+  :root {
+    --page-padding: 12px;
+  }
+
+  body {
+    font-size: 13px;
+  }
+}
