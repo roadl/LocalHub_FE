@@ -11,7 +11,7 @@
     <div class="form-group">
       <label> 카테고리 </label>
 
-      <select v-model="form.contentType">
+      <select v-model="form.category">
         <option v-for="category in categories" :key="category.id" :value="category.id">
           {{ category.name }}
         </option>
@@ -27,13 +27,31 @@
     <div class="button-group">
       <button class="cancel-btn" @click="cancel">취소</button>
 
-      <button class="save-btn" @click="update">수정</button>
+      <button class="save-btn" @click="openPasswordModal">수정</button>
+    </div>
+    <div v-if="showPasswordModal" class="modal-overlay" @click.self="closePasswordModal">
+      <div class="password-modal">
+        <h3>비밀번호 확인</h3>
+
+        <input
+          v-model="password"
+          type="password"
+          placeholder="비밀번호를 입력하세요."
+          @keyup.enter="confirmPassword"
+        />
+
+        <div class="modal-buttons">
+          <button class="cancel-btn" @click="closePasswordModal">취소</button>
+
+          <button class="confirm-btn" @click="confirmPassword">확인</button>
+        </div>
+      </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { reactive } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
 import { CATEGORY_LIST } from '@/constants/category'
@@ -53,26 +71,52 @@ const categories = [
   ...CATEGORY_LIST,
 ]
 
-// API 요청
-// const response = api.get(`/api/v1/community/posts/${post_id}`)
-// const form = reactive(response.data)
+const form = ref({})
 
-const form = reactive({
-  title: '대전 성심당 방문 후기',
+// API
+// GET /api/v1/category/{category}/{content_id}
+const fetchPost = async () => {
+  const response = await api.get(`/api/v1/community/posts/${post_id}`)
+  form.value = response.post
+}
 
-  contentType: 'TOURISM',
-
-  content: '대전 여행 중 방문한 성심당 후기입니다.',
+onMounted(() => {
+  fetchPost()
 })
 
+const showPasswordModal = ref(false)
+const password = ref('')
+
+function openPasswordModal() {
+  password.value = ''
+  showPasswordModal.value = true
+}
+
+function closePasswordModal() {
+  showPasswordModal.value = false
+}
+
+async function confirmPassword() {
+  if (!password.value.trim()) {
+    alert('비밀번호를 입력해주세요.')
+    return
+  }
+
+  update()
+
+  closePasswordModal()
+
+  router.push(`/community/edit/${post.id}`)
+}
+
 const validate = () => {
-  if (!form.title.trim()) {
+  if (!form.value.title.trim()) {
     alert('제목을 입력해주세요.')
 
     return false
   }
 
-  if (!form.content.trim()) {
+  if (!form.value.content.trim()) {
     alert('내용을 입력해주세요.')
 
     return false
@@ -82,18 +126,19 @@ const validate = () => {
 }
 
 const update = async () => {
+  console.log('form', form.value)
   if (!validate()) return
 
   // API 요청
   // PUT /api/v1/community/posts/{post_id}
   const param = {
-    title: form.title,
-    category: form.contentType,
-    content: form.content,
-    password: form.password,
+    title: form.value.title,
+    category: form.value.category,
+    content: form.value.content,
+    password: password.value.trim(),
   }
 
-  await api.put(`/api/v1/community/posts/${post_id}`, param)
+  await api.put(`/api/v1/community/posts/${post_id}`, JSON.stringify(param))
 
   router.push(`/community/${post_id}`)
 }
@@ -176,75 +221,122 @@ textarea {
   border-radius: 8px;
 }
 
-@media(max-width:768px){
+.modal-overlay {
+  position: fixed;
+  inset: 0;
 
-  .edit-page {
+  display: flex;
+  justify-content: center;
+  align-items: center;
 
-    width:100%;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 9999;
+}
 
-    margin:20px auto;
+.password-modal {
+  width: 360px;
+  padding: 24px;
 
-    padding:20px 16px;
+  background: white;
+  border-radius: 12px;
+}
 
-    border-radius:6px;
+.password-modal h3 {
+  margin-bottom: 20px;
+}
+
+.password-modal input {
+  width: 100%;
+  padding: 10px 12px;
+
+  border: 1px solid #dce7f5;
+  border-radius: 6px;
+}
+
+.modal-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+
+  margin-top: 20px;
+}
+
+.cancel-btn,
+.confirm-btn {
+  padding: 8px 18px;
+  border-radius: 6px;
+}
+
+.cancel-btn {
+  background: white;
+  border: 1px solid #dce7f5;
+}
+
+.confirm-btn {
+  background: #4a90e2;
+  color: white;
+  border: none;
+}
+
+@media (max-width: 768px) {
+  .password-modal {
+    width: calc(100% - 32px);
+    margin: 16px;
   }
+}
 
+@media (max-width: 768px) {
+  .edit-page {
+    width: 100%;
+
+    margin: 20px auto;
+
+    padding: 20px 16px;
+
+    border-radius: 6px;
+  }
 
   .edit-page h2 {
+    font-size: 20px;
 
-    font-size:20px;
-
-    margin-bottom:20px;
+    margin-bottom: 20px;
   }
-
 
   .form-group {
-
-    margin-bottom:16px;
+    margin-bottom: 16px;
   }
-
 
   label {
-
-    font-size:14px;
+    font-size: 14px;
   }
-
 
   input,
   select,
   textarea {
+    width: 100%;
 
-    width:100%;
+    font-size: 16px;
 
-    font-size:16px;
-
-    padding:12px;
+    padding: 12px;
   }
-
 
   textarea {
-
-    height:200px;
+    height: 200px;
   }
-
 
   .button-group {
+    width: 100%;
 
-    width:100%;
+    justify-content: center;
 
-    justify-content:center;
-
-    gap:8px;
+    gap: 8px;
   }
-
 
   .cancel-btn,
   .save-btn {
+    flex: 1;
 
-    flex:1;
-
-    padding:12px 0;
+    padding: 12px 0;
   }
-
 }
 </style>

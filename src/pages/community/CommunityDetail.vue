@@ -20,7 +20,7 @@
 
     <div class="like-section">
       <button class="like-btn" @click="clickLike">
-        <img src="@/assets/images/like.png" alt="좋아요"/>
+        <img src="@/assets/images/like.png" alt="좋아요" />
       </button>
 
       <span class="like-count">
@@ -29,7 +29,7 @@
     </div>
 
     <div class="button-group">
-      <button class="edit-btn" @click="openPasswordModal('edit')">수정</button>
+      <button class="edit-btn" @click="moveEdit()">수정</button>
 
       <button class="delete-btn" @click="openPasswordModal('delete')">삭제</button>
     </div>
@@ -52,7 +52,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
 import api from '@/api/api'
@@ -62,28 +62,17 @@ const router = useRouter()
 
 const post_id = route.params.post_id
 
+const post = ref({})
+
 // API
 // GET /api/v1/category/{category}/{content_id}
-// const response = await api.get(`/api/v1/category/${category}/${content_id}`)
-// const detail1 = response.data
+const fetchPost = async () => {
+  const response = await api.get(`/api/v1/community/posts/${post_id}`)
+  post.value = response.post
+}
 
-// PUT /api/v1/category/{category}/{content_id}/view
-// await api.get(`/api/v1/category/${category}/${content_id}/view`)
-
-const post = ref({
-  id: post_id,
-
-  title: '대전 성심당 방문 후기',
-
-  createdTime: '2026-07-14 10:30',
-
-  content: '대전 여행 중 방문한 성심당 후기입니다.',
-
-  view_count: 152,
-
-  like_count: 32,
-
-  pw: '1234',
+onMounted(() => {
+  fetchPost()
 })
 
 const showModal = ref(false)
@@ -110,19 +99,20 @@ const closeModal = () => {
   showModal.value = false
 }
 
+const moveEdit = () => {
+  router.push(`/community/edit/${post_id}`)
+}
+
 const confirmPassword = async () => {
-  if (inputPw.value !== post.value.pw) {
-    alert('비밀번호가 일치하지 않습니다.')
-
-    return
-  }
-
-  if (actionType.value === 'edit') {
-    router.push(`/community/edit/${post_id}`)
-  }
+  console.log('inputPw.value:', inputPw.value)
+  console.log('post.value.pw:', post.value.pw)
 
   if (actionType.value === 'delete') {
-    await api.delete(`/api/v1/community/posts/${post_id}`)
+    const param = {
+      password: inputPw.value,
+    }
+
+    await api.delete(`/api/v1/community/posts/${post_id}`, { data: param })
 
     router.push('/community')
   }
@@ -170,62 +160,52 @@ const confirmPassword = async () => {
   white-space: pre-line;
 }
 
-.like-section{
+.like-section {
+  display: flex;
 
-  display:flex;
+  flex-direction: column;
 
-  flex-direction:column;
+  align-items: center;
 
-  align-items:center;
+  gap: 8px;
 
-  gap:8px;
-
-  margin:40px 0;
-
+  margin: 40px 0;
 }
 
-.like-btn{
+.like-btn {
+  width: 60px;
 
-  width:60px;
+  height: 60px;
 
-  height:60px;
+  display: flex;
 
-  display:flex;
+  justify-content: center;
 
-  justify-content:center;
+  align-items: center;
 
-  align-items:center;
+  border: 1px solid #000000;
 
-  border:1px solid #000000;
+  border-radius: 50%;
 
-  border-radius:50%;
+  background: #87bfff;
 
-  background:#87bfff;
-
-  cursor:pointer;
-
+  cursor: pointer;
 }
 
-.like-btn img{
+.like-btn img {
+  width: 28px;
 
-  width:28px;
-
-  height:28px;
-
+  height: 28px;
 }
 
-.like-btn:hover{
-
-  background:#357ABD;
-
+.like-btn:hover {
+  background: #357abd;
 }
 
-.like-count{
+.like-count {
+  font-size: 14px;
 
-  font-size:14px;
-
-  color:#666;
-
+  color: #666;
 }
 
 .button-group {
@@ -318,111 +298,86 @@ const confirmPassword = async () => {
   padding: 8px 15px;
 }
 
-@media(max-width:768px){
-
+@media (max-width: 768px) {
   .detail-page {
+    width: 100%;
 
-    width:100%;
+    margin: 20px auto;
 
-    margin:20px auto;
+    padding: 20px 16px;
 
-    padding:20px 16px;
-
-    border-radius:6px;
+    border-radius: 6px;
   }
-
 
   .post-header h2 {
+    font-size: 20px;
 
-    font-size:20px;
-
-    word-break:break-word;
+    word-break: break-word;
   }
-
 
   .info {
+    flex-direction: column;
 
-    flex-direction:column;
+    gap: 8px;
 
-    gap:8px;
-
-    font-size:13px;
+    font-size: 13px;
   }
-
 
   .content {
+    min-height: 200px;
 
-    min-height:200px;
+    padding: 20px 0;
 
-    padding:20px 0;
+    font-size: 14px;
 
-    font-size:14px;
+    line-height: 1.7;
 
-    line-height:1.7;
-
-    word-break:break-word;
+    word-break: break-word;
   }
-
 
   .like-section {
-
-    margin:30px 0;
+    margin: 30px 0;
   }
-
 
   .like-btn {
+    width: 52px;
 
-    width:52px;
-
-    height:52px;
+    height: 52px;
   }
-
 
   .like-btn img {
+    width: 24px;
 
-    width:24px;
-
-    height:24px;
+    height: 24px;
   }
-
 
   .button-group {
+    justify-content: center;
 
-    justify-content:center;
+    width: 100%;
 
-    width:100%;
-
-    gap:8px;
+    gap: 8px;
   }
-
 
   .edit-btn,
   .delete-btn {
+    flex: 1;
 
-    flex:1;
-
-    padding:12px 0;
+    padding: 12px 0;
   }
-
 
   .modal {
+    width: calc(100% - 40px);
 
-    width:calc(100% - 40px);
-
-    padding:24px 20px;
+    padding: 24px 20px;
   }
-
 
   .modal-buttons {
-
-    width:100%;
+    width: 100%;
   }
-
 
   .modal-buttons button {
-
-    flex:1;
+    flex: 1;
   }
-
 }
 </style>

@@ -67,7 +67,7 @@
 </template>
 
 <script setup>
-import { ref, computed, watch } from 'vue'
+import { ref, computed, watch, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 
 import { CATEGORY_LIST_ALL } from '@/constants/category'
@@ -87,72 +87,50 @@ const props = defineProps({
   showCategorySelect: {
     type: Boolean,
     default: true,
-  }
+  },
 })
 
 const router = useRouter()
 
 const currentPage = ref(1)
 
-const selectedCategory  = ref(props.inputCategory)
+const selectedCategory = ref(props.inputCategory)
 const searchKeyword = ref('')
 
-// API 요청
-// const response = await api/get(`/api/v1/community/posts/DEFAULT`)
-// const posts = response.data
+const posts = ref([])
 
-const posts = ref([
-  {
-    id: 1,
-    category: 'RESTAURANT',
-    title: '대전 성심당 방문 후기',
-    view_count: 152,
-    like_count: 32,
-    createdTime: '2026-07-14',
-  },
-  {
-    id: 2,
-    category: 'TOURISM',
-    title: '충청도 여행 추천 코스',
-    view_count: 245,
-    like_count: 51,
-    createdTime: '2026-07-13',
-  },
-])
+// API 요청
+const fetchItems = async () => {
+  const response = await api.get(`/api/v1/community/posts/list/${selectedCategory.value}`)
+  posts.value = response.posts
+}
+
+onMounted(() => {
+  fetchItems()
+})
 
 const filteredPosts = computed(() => {
-  return posts.value.filter(post => {
+  return posts.value.filter((post) => {
     const categoryMatch =
-      selectedCategory.value === "DEFAULT" ||
-      post.category === selectedCategory.value;
+      selectedCategory.value === 'DEFAULT' || post.category === selectedCategory.value
 
     const keywordMatch =
-      searchKeyword.value.trim() === "" ||
-      post.title
-        .toLowerCase()
-        .includes(searchKeyword.value.toLowerCase());
+      searchKeyword.value.trim() === '' ||
+      post.title.toLowerCase().includes(searchKeyword.value.toLowerCase())
 
-    return categoryMatch && keywordMatch;
-  });
-});
-
+    return categoryMatch && keywordMatch
+  })
+})
 
 const totalPage = computed(() => {
-  return Math.ceil(
-    filteredPosts.value.length / props.pageSize
-  );
-});
-
+  return Math.ceil(filteredPosts.value.length / props.pageSize)
+})
 
 const displayPosts = computed(() => {
-  const start =
-    (currentPage.value - 1) * props.pageSize;
+  const start = (currentPage.value - 1) * props.pageSize
 
-  return filteredPosts.value.slice(
-    start,
-    start + props.pageSize
-  );
-});
+  return filteredPosts.value.slice(start, start + props.pageSize)
+})
 
 const pages = computed(() => {
   const size = 10
@@ -193,12 +171,9 @@ const moveWrite = () => {
   router.push('/community/write')
 }
 
-watch(
-  [selectedCategory, searchKeyword],
-  () => {
-    currentPage.value = 1;
-  }
-);
+watch([selectedCategory, searchKeyword], () => {
+  currentPage.value = 1
+})
 </script>
 
 <style scoped>
@@ -332,146 +307,104 @@ watch(
   border-radius: 8px;
 }
 
-@media(max-width:768px){
-
+@media (max-width: 768px) {
   .community-section {
-    margin-bottom:30px;
+    margin-bottom: 30px;
   }
-
 
   .community-header {
+    flex-direction: column;
 
-    flex-direction:column;
+    align-items: stretch;
 
-    align-items:stretch;
+    gap: 15px;
 
-    gap:15px;
-
-    margin-bottom:15px;
+    margin-bottom: 15px;
   }
-
 
   .community-header h2 {
-
-    font-size:22px;
+    font-size: 22px;
   }
-
 
   .search-box {
-
-    width:100%;
+    width: 100%;
   }
-
 
   .search-box select {
-
-    flex:0 0 90px;
+    flex: 0 0 90px;
   }
-
 
   .search-box input {
+    width: 100%;
 
-    width:100%;
+    margin-left: 0;
 
-    margin-left:0;
-
-    padding:10px;
+    padding: 10px;
   }
-
 
   .search-box button {
-
-    width:45px;
-
+    width: 45px;
   }
-
 
   /*
     테이블 모바일 대응
   */
   .community-table {
+    display: block;
 
-    display:block;
+    overflow-x: auto;
 
-    overflow-x:auto;
-
-    white-space:nowrap;
-
+    white-space: nowrap;
   }
-
 
   .community-table th,
   .community-table td {
+    padding: 10px 12px;
 
-    padding:10px 12px;
-
-    font-size:13px;
-
+    font-size: 13px;
   }
-
 
   .community-table th:nth-child(1),
   .community-table td:nth-child(1) {
-
-    width:50px;
-
+    width: 50px;
   }
-
 
   .community-table th:nth-child(2),
   .community-table td:nth-child(2) {
-
-    min-width:180px;
-
+    min-width: 180px;
   }
-
 
   .community-table th:nth-child(5),
   .community-table td:nth-child(5) {
-
-    min-width:100px;
-
+    min-width: 100px;
   }
-
 
   .community-footer {
+    margin-top: 15px;
 
-    margin-top:15px;
+    flex-direction: column;
 
-    flex-direction:column;
-
-    gap:15px;
-
+    gap: 15px;
   }
-
 
   .pagination {
-
-    gap:4px;
-
+    gap: 4px;
   }
-
 
   .pagination button {
+    min-width: 32px;
 
-    min-width:32px;
+    height: 32px;
 
-    height:32px;
-
-    font-size:12px;
-
+    font-size: 12px;
   }
-
 
   .write-btn {
+    position: static;
 
-    position:static;
+    width: 100%;
 
-    width:100%;
-
-    padding:12px;
-
+    padding: 12px;
   }
-
 }
 </style>

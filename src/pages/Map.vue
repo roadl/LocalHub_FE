@@ -28,6 +28,7 @@
 
 <script setup>
 import { ref, onMounted, onBeforeUnmount } from 'vue'
+import { useRouter } from 'vue-router'
 
 import L from 'leaflet'
 
@@ -36,35 +37,45 @@ import 'leaflet/dist/leaflet.css'
 import { CATEGORY_DATA } from '@/constants/tempData'
 
 // =====================
+// Router
+// =====================
+
+const router = useRouter()
+
+function moveCategory(item) {
+  router.push(`/category/${item.contentid}`)
+}
+
+// =====================
 // Icon
 // =====================
 
 const createIcon = (name) => {
   return L.icon({
-    iconUrl: `/${name}.png`,
+    iconUrl: `/icons/${name}.png`,
 
-    iconSize: [35, 35],
+    iconSize: [35, 45],
 
     iconAnchor: [17, 35],
   })
 }
 
 const categoryIcons = {
-  TOURISM: createIcon('marker'),
+  TOURISM: createIcon('TOURISM'),
 
-  LEISURE: createIcon('marker'),
+  LEISURE: createIcon('LEISURE'),
 
-  CULTURAL_FACILITY: createIcon('marker'),
+  CULTURAL_FACILITY: createIcon('CULTURAL_FACILITY'),
 
-  SHOPPING: createIcon('marker'),
+  SHOPPING: createIcon('SHOPPING'),
 
-  ACCOMMODATION: createIcon('marker'),
+  ACCOMMODATION: createIcon('ACCOMMODATION'),
 
-  TRAVEL_COURSE: createIcon('marker'),
+  TRAVEL_COURSE: createIcon('TRAVEL_COURSE'),
 
-  RESTAURANT: createIcon('marker'),
+  RESTAURANT: createIcon('RESTAURANT'),
 
-  FESTIVAL: createIcon('marker'),
+  FESTIVAL: createIcon('FESTIVAL'),
 }
 
 // =====================
@@ -96,6 +107,8 @@ const places = Object.entries(CATEGORY_DATA).flatMap(([category, data]) => {
     lng: Number(item.mapx),
 
     image: item.firstimage,
+
+    contentid: item.contentid,
   }))
 })
 
@@ -144,7 +157,7 @@ const renderMarkers = () => {
           `
       <div>
         <h3>${place.title}</h3>
-        <img src=${place.image ? place.image : '/default.png'} alt="대표 이미지" />
+        <img class="popup-image" src=${place.image ? place.image : '/default.png'} alt="대표 이미지" />
         <p>${place.address}</p>
       </div>
       `,
@@ -160,6 +173,13 @@ const renderMarkers = () => {
           map.setView([place.lat, place.lng], targetZoom, {
             animate: true,
             duration: 1.0,
+          })
+        })
+        .on('popupopen', () => {
+          const image = document.querySelector('.popup-image')
+
+          image?.addEventListener('click', () => {
+            moveCategory(place)
           })
         })
 

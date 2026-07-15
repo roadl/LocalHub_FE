@@ -86,10 +86,14 @@ async function handleSend(text) {
 
   try {
     const response = await sendMessage(
-      messages.value.map((message) => ({
-        sender: message.sender,
-        message: message.text,
-      })),
+      messages.value
+        .filter((message, index) => {
+          return !(index === 0 && message.sender === 'bot')
+        })
+        .map((message) => ({
+          sender: message.sender,
+          message: message.text,
+        })),
     )
 
     addBotMessage(response.message)
