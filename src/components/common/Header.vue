@@ -17,8 +17,8 @@
           <span>Category</span>
 
           <ul class="dropdown-menu">
-            <li v-for="item in categories" :key="item.id">
-              <RouterLink :to="`/category/${item.id}`" @click="closeMenu">
+            <li v-for="item in categories" :key="item.code">
+              <RouterLink :to="`/category/${item.code}`" @click="closeMenu">
                 {{ item.name }}
               </RouterLink>
             </li>
@@ -45,11 +45,20 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 
-import { CATEGORY_LIST } from '@/constants/category.js'
+import api from '@/api/api.js'
 
-const categories = CATEGORY_LIST
+const categories = ref([])
+
+const fetchCategories = async () => {
+  const data = await api.get('/api/v1/category')
+  categories.value = data.categories
+}
+
+onMounted(() => {
+  fetchCategories()
+})
 
 const mobileMenuOpen = ref(false)
 

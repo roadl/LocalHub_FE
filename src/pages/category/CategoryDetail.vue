@@ -3,9 +3,9 @@
     <h2>{{ detail.title }}</h2>
 
     <div class="image-section">
-      <img :src="detail.image_url" alt="대표 이미지" />
+      <img :src="detail.image_url || '/default.png'" alt="대표 이미지" />
 
-      <PlaceMap />
+      <PlaceMap :lat="detail.mapy" :lng="detail.mapx" />
     </div>
 
     <table class="detail-table">
@@ -17,7 +17,7 @@
 
         <tr>
           <th>등록일자</th>
-          <td>{{ detail.createdtime }}</td>
+          <td>{{ formatDate(detail.createdtime) }}</td>
         </tr>
 
         <tr>
@@ -48,7 +48,6 @@ import api from '@/api/api'
 
 const route = useRoute()
 
-const category = route.params.category
 const content_id = route.params.content_id
 
 // 예시 데이터
@@ -56,8 +55,8 @@ const detail = ref({})
 
 // 실제 데이터를 가져오는 함수
 const fetchDetail = async () => {
-  const { data } = await api.get(`/api/v1/location/${category}/${content_id}`)
-  detail.value = data ?? {
+  const data = await api.get(`/api/v1/location/detail/${content_id}`)
+  detail.value = data.location ?? {
     title: '데이터 없음',
     address: '데이터 없음',
     createdtime: '데이터 없음',
@@ -66,6 +65,13 @@ const fetchDetail = async () => {
     mapx: '데이터 없음',
     image_url: '/default.png',
   }
+}
+
+const formatDate = (date) => {
+  if (!date) return ''
+
+  const str = String(date)
+  return `${str.slice(0, 4)}-${str.slice(4, 6)}-${str.slice(6, 8)}`
 }
 
 onMounted(() => {

@@ -17,29 +17,21 @@ import CommunityBoard from '@/components/community/CommunityBoard.vue'
   padding: 0 24px;
 }
 
-
 /* 모바일 */
-@media(max-width:768px){
-
+@media (max-width: 768px) {
   .community-page {
+    margin: 20px auto;
 
-    margin:20px auto;
-
-    padding:0 16px;
+    padding: 0 16px;
   }
-
 }
 
-
 /* 작은 모바일 */
-@media(max-width:480px){
-
+@media (max-width: 480px) {
   .community-page {
+    margin: 16px auto;
 
-    margin:16px auto;
-
-    padding:0 12px;
+    padding: 0 12px;
   }
-
 }
 </style>

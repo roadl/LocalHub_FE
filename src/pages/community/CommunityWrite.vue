@@ -117,8 +117,6 @@ const submit = async () => {
 
   await api.post('/api/v1/community/posts', param)
 
-  console.log(form)
-
   router.push('/community')
 }
 
@@ -129,16 +127,16 @@ const cancel = () => {
 
 <style scoped>
 .write-page {
-  width:100%;
-  max-width:800px;
+  width: 100%;
+  max-width: 800px;
 
-  margin:40px auto;
+  margin: 40px auto;
 
-  padding:30px;
+  padding: 30px;
 
-  background:white;
+  background: white;
 
-  border-radius:8px;
+  border-radius: 8px;
 }
 
 .form-group {
@@ -201,73 +199,56 @@ textarea {
   border-radius: 8px;
 }
 
-@media(max-width:768px){
-
+@media (max-width: 768px) {
   .write-page {
+    margin: 20px auto;
 
-    margin:20px auto;
+    padding: 20px 16px;
 
-    padding:20px 16px;
-
-    border-radius:6px;
+    border-radius: 6px;
   }
-
 
   .write-page h2 {
+    font-size: 20px;
 
-    font-size:20px;
-
-    margin-bottom:20px;
+    margin-bottom: 20px;
   }
-
 
   .form-group {
-
-    margin-bottom:16px;
+    margin-bottom: 16px;
   }
-
 
   label {
-
-    font-size:14px;
+    font-size: 14px;
   }
-
 
   input,
   select,
   textarea {
+    width: 100%;
 
-    width:100%;
+    font-size: 16px;
 
-    font-size:16px;
-
-    padding:12px;
+    padding: 12px;
   }
-
 
   textarea {
-
-    height:200px;
+    height: 200px;
   }
-
 
   .button-group {
+    width: 100%;
 
-    width:100%;
+    justify-content: center;
 
-    justify-content:center;
-
-    gap:8px;
+    gap: 8px;
   }
-
 
   .cancel-btn,
   .submit-btn {
+    flex: 1;
 
-    flex:1;
-
-    padding:12px 0;
+    padding: 12px 0;
   }
-
 }
 </style>

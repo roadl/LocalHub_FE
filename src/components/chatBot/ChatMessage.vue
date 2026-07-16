@@ -1,12 +1,6 @@
 <template>
-  <div
-    class="message-wrapper"
-    :class="message.sender === 'user' ? 'user-wrapper' : 'bot-wrapper'"
-  >
-    <div
-      class="message-bubble"
-      :class="message.sender === 'user' ? 'user-bubble' : 'bot-bubble'"
-    >
+  <div class="message-wrapper" :class="message.sender === 'user' ? 'user-wrapper' : 'bot-wrapper'">
+    <div class="message-bubble" :class="message.sender === 'user' ? 'user-bubble' : 'bot-bubble'">
       <div class="message-text">
         {{ message.text }}
       </div>
@@ -24,7 +18,7 @@ defineProps({
     type: Object,
     required: true,
   },
-});
+})
 </script>
 
 <style scoped>
@@ -94,37 +88,29 @@ defineProps({
   }
 }
 
-@media(max-width:768px){
-
+@media (max-width: 768px) {
   .message-wrapper {
-    margin-bottom:10px;
+    margin-bottom: 10px;
   }
-
 
   .message-bubble {
+    max-width: 85%;
 
-    max-width:85%;
+    padding: 10px 14px;
 
-    padding:10px 14px;
-
-    border-radius:16px;
+    border-radius: 16px;
   }
-
 
   .message-text {
+    font-size: 15px;
 
-    font-size:15px;
-
-    line-height:1.6;
+    line-height: 1.6;
   }
-
 
   .message-time {
+    font-size: 10px;
 
-    font-size:10px;
-
-    margin-top:4px;
+    margin-top: 4px;
   }
-
 }
 </style>

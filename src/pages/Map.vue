@@ -34,7 +34,9 @@ import L from 'leaflet'
 
 import 'leaflet/dist/leaflet.css'
 
-import { CATEGORY_DATA } from '@/constants/tempData'
+import api from '@/api/api'
+
+import { CATEGORY_LIST } from '@/constants/category'
 
 // =====================
 // Router
@@ -43,7 +45,7 @@ import { CATEGORY_DATA } from '@/constants/tempData'
 const router = useRouter()
 
 function moveCategory(item) {
-  router.push(`/category/${item.contentid}`)
+  router.push(`/category/${item.category}/${item.contentid}`)
 }
 
 // =====================
@@ -82,10 +84,10 @@ const categoryIcons = {
 // Category
 // =====================
 
-const categories = Object.keys(CATEGORY_DATA).map((id) => ({
-  id,
+const categories = CATEGORY_LIST.map((item) => ({
+  id: item.id,
 
-  name: CATEGORY_DATA[id].contentType,
+  name: item.name,
 }))
 
 const selectedCategories = ref(categories.map((item) => item.id))
@@ -94,23 +96,57 @@ const selectedCategories = ref(categories.map((item) => item.id))
 // Data
 // =====================
 
-const places = Object.entries(CATEGORY_DATA).flatMap(([category, data]) => {
-  return data.items.map((item) => ({
-    category,
+// CATEGORY_DATA[category] 형태로 접근 가능
+const CATEGORY_DATA = ref({})
 
-    title: item.title,
+// 지도 마커 렌더에 사용하는 평탄화된 목록
+const places = ref([])
 
-    address: item.addr1,
+const buildPlaces = () => {
+  places.value = Object.entries(CATEGORY_DATA.value).flatMap(([category, items]) => {
+    return items.map((item) => ({
+      category,
 
-    lat: Number(item.mapy),
+      title: item.title,
 
-    lng: Number(item.mapx),
+      address: item.address,
 
-    image: item.firstimage,
+      lat: Number(item.mapy),
 
-    contentid: item.contentid,
-  }))
-})
+      lng: Number(item.mapx),
+
+      image: item.image_url,
+
+      contentid: item.content_id,
+    }))
+  })
+}
+
+// 카테고리별 API 병렬 요청
+const fetchCategoryData = async () => {
+  const results = await Promise.all(
+    CATEGORY_LIST.map(async ({ id }) => {
+      try {
+        const res = await api.get(`/api/v1/location/${id}`)
+
+        // 응답이 items 배열이라고 가정. 감싸져 있다면 res.data.items 등으로 수정
+        return { id, items: res.items ?? [] }
+      } catch (error) {
+        console.error(`[${id}] 카테고리 데이터 로드 실패`, error)
+
+        return { id, items: [] }
+      }
+    }),
+  )
+
+  CATEGORY_DATA.value = results.reduce((acc, { id, items }) => {
+    acc[id] = items
+
+    return acc
+  }, {})
+
+  buildPlaces()
+}
 
 // =====================
 // Map
@@ -137,11 +173,11 @@ const renderMarkers = () => {
       marker.remove()
     })
 
-  Object.keys(CATEGORY_DATA).forEach((category) => {
-    markers[category] = []
+  CATEGORY_LIST.forEach(({ id }) => {
+    markers[id] = []
   })
 
-  places
+  places.value
     .filter((place) => {
       const keyword = searchKeyword.value.trim()
 
@@ -175,12 +211,16 @@ const renderMarkers = () => {
             duration: 1.0,
           })
         })
-        .on('popupopen', () => {
-          const image = document.querySelector('.popup-image')
+        .on('popupopen', (e) => {
+          const image = e.popup.getElement()?.querySelector('.popup-image')
 
-          image?.addEventListener('click', () => {
+          if (!image) return
+
+          image.style.cursor = 'pointer'
+
+          image.onclick = () => {
             moveCategory(place)
-          })
+          }
         })
 
       markers[place.category].push(marker)
@@ -243,7 +283,9 @@ const initMap = () => {
   renderMarkers()
 }
 
-onMounted(() => {
+onMounted(async () => {
+  await fetchCategoryData()
+
   initMap()
 })
 

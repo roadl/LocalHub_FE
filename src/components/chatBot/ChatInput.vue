@@ -11,72 +11,66 @@
       @input="resizeTextarea"
     />
 
-    <button
-      class="send-button"
-      :disabled="disabled || !message.trim()"
-      @click="send"
-    >
-      ➤
-    </button>
+    <button class="send-button" :disabled="disabled || !message.trim()" @click="send">➤</button>
   </div>
 </template>
 
 <script setup>
-import { ref, nextTick, onMounted } from "vue";
+import { ref, nextTick, onMounted } from 'vue'
 
 const props = defineProps({
   disabled: {
     type: Boolean,
     default: false,
   },
-});
+})
 
-const emit = defineEmits(["send"]);
+const emit = defineEmits(['send'])
 
-const message = ref("");
-const inputRef = ref(null);
+const message = ref('')
+const inputRef = ref(null)
 
 function send() {
-  const text = message.value.trim();
+  const text = message.value.trim()
 
-  if (!text || props.disabled) return;
+  if (!text || props.disabled) return
 
-  emit("send", text);
+  emit('send', text)
 
-  message.value = "";
+  message.value = ''
 
   nextTick(() => {
-    resizeTextarea();
-    inputRef.value?.focus();
-  });
+    resizeTextarea()
+    inputRef.value?.focus()
+  })
 }
 
 function handleKeyDown(event) {
   // Shift + Enter => 줄바꿈
-  if (event.shiftKey && event.key === "Enter") {
-    return;
+  if (event.shiftKey && event.key === 'Enter') {
+    return
   }
 
   // Enter => 전송
-  if (event.key === "Enter") {
-    event.preventDefault();
-    send();
+  if (event.key === 'Enter') {
+    event.preventDefault()
+    send()
   }
 }
 
 function resizeTextarea() {
-  const textarea = inputRef.value;
+  const textarea = inputRef.value
 
-  if (!textarea) return;
+  if (!textarea) return
 
-  textarea.style.height = "auto";
-  textarea.style.height = `${Math.min(textarea.scrollHeight, 120)}px`;
+  textarea.style.height = 'auto'
+  textarea.style.height = `${Math.min(textarea.scrollHeight, 120)}px`
 }
 
 onMounted(() => {
-  inputRef.value?.focus();
-  resizeTextarea();
-});
+  inputRef.value?.focus()
+  resizeTextarea()
+})
 </script>
 
 <style scoped>
@@ -147,39 +141,31 @@ onMounted(() => {
   cursor: not-allowed;
 }
 
-@media(max-width:768px){
-
+@media (max-width: 768px) {
   .chat-input-container {
     padding: 10px;
     gap: 8px;
 
-    padding-bottom: calc(
-      10px + env(safe-area-inset-bottom)
-    );
+    padding-bottom: calc(10px + env(safe-area-inset-bottom));
   }
-
 
   .chat-input {
+    min-height: 44px;
 
-    min-height:44px;
+    padding: 12px 14px;
 
-    padding:12px 14px;
+    font-size: 16px;
 
-    font-size:16px;
-
-    border-radius:18px;
+    border-radius: 18px;
   }
-
 
   .send-button {
+    width: 48px;
+    height: 48px;
 
-    width:48px;
-    height:48px;
+    flex-shrink: 0;
 
-    flex-shrink:0;
-
-    font-size:20px;
+    font-size: 20px;
   }
-
 }
 </style>

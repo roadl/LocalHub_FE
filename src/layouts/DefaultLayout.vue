@@ -13,9 +13,9 @@
 </template>
 
 <script setup>
-import Header from "@/components/common/Header.vue";
-import Footer from "@/components/common/Footer.vue";
-import ChatBot from "@/components/chatBot/ChatBot.vue";
+import Header from '@/components/common/Header.vue'
+import Footer from '@/components/common/Footer.vue'
+import ChatBot from '@/components/chatBot/ChatBot.vue'
 </script>
 
 <style scoped>
@@ -34,7 +34,6 @@ import ChatBot from "@/components/chatBot/ChatBot.vue";
   padding: 0 24px;
 }
 
-
 /* 모바일 */
 @media (max-width: 768px) {
   .content {
@@ -42,7 +41,6 @@ import ChatBot from "@/components/chatBot/ChatBot.vue";
     padding: 0 16px;
   }
 }
-
 
 /* 작은 모바일 */
 @media (max-width: 480px) {

@@ -55,7 +55,7 @@
 import { computed, ref, watch, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
-import { CATEGORY_LIST } from '@/constants/category'
+import { CATEGORY_LIST_ALL } from '@/constants/category'
 import defaultImage from '@/assets/images/default.png'
 import api from '@/api/api'
 
@@ -67,7 +67,7 @@ const router = useRouter()
 const category = computed(() => route.params.category)
 
 const categoryDetail = computed(() => {
-  return CATEGORY_LIST.find((item) => item.id === category.value)
+  return CATEGORY_LIST_ALL.find((item) => item.id === category.value)
 })
 
 const categoryData = ref([])

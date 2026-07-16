@@ -47,5 +47,5 @@ export const CATEGORY_LIST_ALL = [
     name: '전체',
     description: '전체 카테고리',
   },
-  ...CATEGORY_LIST
+  ...CATEGORY_LIST,
 ]

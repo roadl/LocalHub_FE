@@ -4,114 +4,71 @@
   </div>
 </template>
 
-
 <script setup>
-import { ref, onMounted, onBeforeUnmount } from "vue";
-import L from "leaflet";
+import { ref, onMounted, onBeforeUnmount, watch } from 'vue'
+import L from 'leaflet'
 
-import "leaflet/dist/leaflet.css";
+import 'leaflet/dist/leaflet.css'
 
-
-// 기본 위치 (대전)
 const props = defineProps({
-  latitude: {
+  lat: {
     type: Number,
     default: 36.3504,
   },
-
-  longitude: {
+  lon: {
     type: Number,
     default: 127.3845,
   },
-
   zoom: {
     type: Number,
     default: 13,
   },
-});
+})
 
+const mapElement = ref(null)
 
-const mapElement = ref(null);
+let map = null
+let marker = null
 
-let map = null;
-let marker = null;
-
-
-// 지도 생성
 const initMap = () => {
+  map = L.map(mapElement.value).setView([props.lat, props.lon], props.zoom)
 
-  map = L.map(mapElement.value).setView(
-    [
-      props.latitude,
-      props.longitude
-    ],
-    props.zoom
-  );
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; OpenStreetMap contributors',
+  }).addTo(map)
 
+  marker = L.marker([props.lat, props.lon]).addTo(map)
+}
 
-  // OpenStreetMap Tile
-  L.tileLayer(
-    "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
-    {
-      attribution:
-        '&copy; OpenStreetMap contributors',
-    }
-  ).addTo(map);
+watch(
+  () => [props.lat, props.lon, props.zoom],
+  ([lat, lon, zoom]) => {
+    if (!map || !marker) return
 
+    map.setView([lat, lon], zoom)
+    marker.setLatLng([lat, lon])
+  },
+)
 
-  // Marker
-  marker = L.marker([
-    props.latitude,
-    props.longitude
-  ])
-  .addTo(map)
-  .bindPopup(
-    "현재 위치"
-  )
-};
-
-
-onMounted(() => {
-
-  initMap();
-
-});
-
+onMounted(initMap)
 
 onBeforeUnmount(() => {
-
-  if(map){
-
-    map.remove();
-
-    map = null;
-
-  }
-
-});
-
+  map?.remove()
+})
 </script>
 
-
 <style scoped>
-
 .map-container {
+  width: 100%;
 
-  width:100%;
-
-  height:400px;
-
+  height: 400px;
 }
-
 
 .map {
+  width: 100%;
 
-  width:100%;
+  height: 100%;
 
-  height:100%;
-
-  border-radius:8px;
-
+  border-radius: 8px;
 }
-
 </style>

@@ -6,7 +6,7 @@
       </h2>
 
       <div class="info">
-        <span> 작성시간 {{ post.created_at }} </span>
+        <span> 작성시간 {{ formatDateTime(post.created_at) }} </span>
 
         <span> 조회 {{ post.view_count }} </span>
 
@@ -120,6 +120,12 @@ const confirmPassword = async () => {
   }
 
   closeModal()
+}
+
+const formatDateTime = (dateTime) => {
+  if (!dateTime) return ''
+
+  return dateTime.replace('T', ' ').split('.')[0]
 }
 </script>
 

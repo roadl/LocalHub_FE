@@ -37,7 +37,7 @@
 
           <td>{{ post.like_count }}</td>
 
-          <td>{{ post.created_at }}</td>
+          <td>{{ formatDateTime(post.created_at) }}</td>
         </tr>
       </tbody>
     </table>
@@ -169,6 +169,12 @@ const movePost = (id) => {
 
 const moveWrite = () => {
   router.push('/community/write')
+}
+
+const formatDateTime = (dateTime) => {
+  if (!dateTime) return ''
+
+  return dateTime.replace('T', ' ').split('.')[0]
 }
 
 watch([selectedCategory, searchKeyword], () => {
