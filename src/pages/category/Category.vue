@@ -9,9 +9,9 @@
     <div class="card-grid">
       <div
         class="category-card"
-        v-for="(item, index) in displayItems"
-        :key="index"
-        @click="moveDetail(index)"
+        v-for="item in displayItems"
+        :key="item.content_id"
+        @click="moveDetail(item.content_id)"
       >
         <div class="card-image">
           <img :src="item.image_url || defaultImage" :alt="item.title" />
@@ -52,12 +52,12 @@
 </template>
 
 <script setup>
-import { computed, ref, watch } from 'vue'
+import { computed, ref, watch, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
-import { CATEGORY_DATA } from '@/constants/data'
 import { CATEGORY_LIST } from '@/constants/category'
 import defaultImage from '@/assets/images/default.png'
+import api from '@/api/api'
 
 import CommunityBoard from '@/components/community/CommunityBoard.vue'
 
@@ -70,7 +70,7 @@ const categoryDetail = computed(() => {
   return CATEGORY_LIST.find((item) => item.id === category.value)
 })
 
-const categoryData = ref(CATEGORY_DATA[category.value])
+const categoryData = ref([])
 
 const currentPage = ref(1)
 
@@ -78,14 +78,22 @@ const searchKeyword = ref('')
 
 const pageSize = 12
 
-const loadCategory = () => {
-  categoryData.value = CATEGORY_DATA[category.value]
+const fetchCategoryData = async () => {
+  const locations = await api.get(`/api/v1/location/${category.value}`)
+
+  categoryData.value = locations.items
+
+  currentPage.value = 1
 }
+
+onMounted(() => {
+  fetchCategoryData()
+})
 
 const filteredItems = computed(() => {
   const keyword = searchKeyword.value.trim().toLowerCase()
 
-  return categoryData.value.data.filter((item) => {
+  return categoryData.value.filter((item) => {
     if (keyword === '') return true
 
     return (
@@ -131,10 +139,8 @@ const nextPage = () => {
   if (currentPage.value < totalPage.value) currentPage.value++
 }
 
-const moveDetail = (index) => {
-  const item = displayItems.value[index]
-
-  router.push(`/category/${category.value}/${item.id ?? index}`)
+const moveDetail = (contentId) => {
+  router.push(`/category/${category.value}/${contentId}`)
 }
 
 watch(searchKeyword, () => {
@@ -143,12 +149,10 @@ watch(searchKeyword, () => {
 
 watch(
   () => route.params.category,
-  () => {
-    currentPage.value = 1
-
+  async () => {
     searchKeyword.value = ''
 
-    loadCategory()
+    await fetchCategoryData()
   },
 )
 </script>

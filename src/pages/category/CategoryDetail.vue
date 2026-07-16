@@ -16,8 +16,8 @@
         </tr>
 
         <tr>
-          <th>상세주소</th>
-          <td>{{ detail.addr2 }}</td>
+          <th>등록일자</th>
+          <td>{{ detail.createdtime }}</td>
         </tr>
 
         <tr>
@@ -40,9 +40,8 @@
 </template>
 
 <script setup>
+import { ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
-
-import { CATEGORY_DATA } from '@/constants/data'
 
 import PlaceMap from '@/components/map/PlaceMap.vue'
 import api from '@/api/api'
@@ -53,7 +52,25 @@ const category = route.params.category
 const content_id = route.params.content_id
 
 // 예시 데이터
-const detail = CATEGORY_DATA[category].data[content_id]
+const detail = ref({})
+
+// 실제 데이터를 가져오는 함수
+const fetchDetail = async () => {
+  const { data } = await api.get(`/api/v1/location/${category}/${content_id}`)
+  detail.value = data ?? {
+    title: '데이터 없음',
+    address: '데이터 없음',
+    createdtime: '데이터 없음',
+    phone: '데이터 없음',
+    mapy: '데이터 없음',
+    mapx: '데이터 없음',
+    image_url: '/default.png',
+  }
+}
+
+onMounted(() => {
+  fetchDetail()
+})
 </script>
 
 <style scoped>
