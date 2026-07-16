@@ -43,7 +43,7 @@
 import { ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 
-import PlaceMap from '@/components/map/PlaceMap.vue'
+import PlaceMap from '@/components/Map/PlaceMap.vue'
 import api from '@/api/api'
 
 const route = useRoute()
