@@ -10,9 +10,9 @@
           </option>
         </select>
 
-        <input v-model="searchKeyword" placeholder="Search" />
+        <input v-model="searchKeyword" placeholder="Search" @keyup.enter="fetchItems" />
 
-        <button>🔍</button>
+        <button @click="fetchItems">🔍</button>
       </div>
     </div>
 
@@ -101,26 +101,31 @@ const posts = ref([])
 
 // API 요청
 const fetchItems = async () => {
-  const response = await api.get(`/api/v1/community/posts/list/${selectedCategory.value}`)
+  // 검색어가 없는 경우 기존 목록 조회
+  if (searchKeyword.value.trim() === '') {
+    const response = await api.get(`/api/v1/community/posts/list/${selectedCategory.value}`)
+    posts.value = response.posts
+    currentPage.value = 1
+    return
+  }
+
+  // 검색어가 있는 경우 검색 API 호출
+  const response = await api.get('/api/v1/community/posts/search', {
+    params: {
+      keyword: searchKeyword.value.trim(),
+      category: selectedCategory.value,
+    },
+  })
+
   posts.value = response.posts
+  currentPage.value = 1
 }
 
 onMounted(() => {
   fetchItems()
 })
 
-const filteredPosts = computed(() => {
-  return posts.value.filter((post) => {
-    const categoryMatch =
-      selectedCategory.value === 'DEFAULT' || post.category === selectedCategory.value
-
-    const keywordMatch =
-      searchKeyword.value.trim() === '' ||
-      post.title.toLowerCase().includes(searchKeyword.value.toLowerCase())
-
-    return categoryMatch && keywordMatch
-  })
-})
+const filteredPosts = computed(() => posts.value)
 
 const totalPage = computed(() => {
   return Math.ceil(filteredPosts.value.length / props.pageSize)
@@ -177,8 +182,8 @@ const formatDateTime = (dateTime) => {
   return dateTime.replace('T', ' ').split('.')[0]
 }
 
-watch([selectedCategory, searchKeyword], () => {
-  currentPage.value = 1
+watch(selectedCategory, () => {
+  fetchItems()
 })
 </script>
 
