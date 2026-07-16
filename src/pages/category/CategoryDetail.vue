@@ -5,7 +5,7 @@
     <div class="image-section">
       <img :src="detail.image_url || '/default.png'" alt="대표 이미지" />
 
-      <PlaceMap :lat="detail.mapy" :lng="detail.mapx" />
+      <PlaceMap :lat="detail.mapy" :lon="detail.mapx" :iconUrl="'/icons/' + category + '.png'" />
     </div>
 
     <table class="detail-table">
@@ -48,6 +48,7 @@ import api from '@/api/api'
 
 const route = useRoute()
 
+const category = route.params.category
 const content_id = route.params.content_id
 
 // 예시 데이터
@@ -64,6 +65,7 @@ const fetchDetail = async () => {
     mapy: '데이터 없음',
     mapx: '데이터 없음',
     image_url: '/default.png',
+    category: 'TOURISM',
   }
 }
 

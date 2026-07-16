@@ -5,7 +5,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onBeforeUnmount, watch } from 'vue'
+import { ref, onMounted, onBeforeUnmount, watch, computed } from 'vue'
 import L from 'leaflet'
 
 import 'leaflet/dist/leaflet.css'
@@ -23,9 +23,22 @@ const props = defineProps({
     type: Number,
     default: 13,
   },
+  iconUrl: {
+    type: String,
+    default: '/icons/TOURISM.png',
+  },
 })
 
 const mapElement = ref(null)
+
+const customIcon = computed(() =>
+  L.icon({
+    iconUrl: props.iconUrl,
+    iconSize: [35, 45],
+    iconAnchor: [17, 35],
+    popupAnchor: [0, -40],
+  }),
+)
 
 let map = null
 let marker = null
@@ -37,7 +50,9 @@ const initMap = () => {
     attribution: '&copy; OpenStreetMap contributors',
   }).addTo(map)
 
-  marker = L.marker([props.lat, props.lon]).addTo(map)
+  marker = L.marker([props.lat, props.lon], {
+    icon: customIcon.value,
+  }).addTo(map)
 }
 
 watch(
