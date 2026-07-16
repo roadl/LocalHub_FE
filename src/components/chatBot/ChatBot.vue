@@ -42,7 +42,7 @@ function currentTime() {
 function addBotMessage(text) {
   messages.value.push({
     id: Date.now() + Math.random(),
-    sender: 'bot',
+    sender: 'assistant',
     text,
     time: currentTime(),
   })
@@ -88,15 +88,15 @@ async function handleSend(text) {
     const response = await sendMessage(
       messages.value
         .filter((message, index) => {
-          return !(index === 0 && message.sender === 'bot')
+          return !(index === 0 && message.sender === 'assistant')
         })
         .map((message) => ({
-          sender: message.sender,
-          message: message.text,
+          role: message.sender,
+          content: message.text,
         })),
     )
 
-    addBotMessage(response.message)
+    addBotMessage(response.choices[0].message.content)
   } catch (e) {
     addBotMessage('죄송합니다.\n잠시 후 다시 시도해주세요.')
   } finally {

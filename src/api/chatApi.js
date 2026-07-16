@@ -11,6 +11,7 @@ const chatapi = axios.create({
 export async function sendMessage(messages) {
   const response = await chatapi.post('/api/v1/chat', {
     messages,
+    stream: false,
   })
 
   return response.data.data
